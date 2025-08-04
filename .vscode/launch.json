@@ -1,0 +1,51 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+         {
+            "name": "Python: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "purpose": [
+                "debug-test",
+                "debug-in-terminal"
+            ],
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/.env",
+            "justMyCode": true,
+            "args": [
+                "--move-images",
+                "True"
+            ]
+        },
+        {
+            "name": "Python: Streamlit App",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "streamlit",
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/.env",
+            "args": [
+                "run",
+                "streamlit_app/app.py"
+            ],
+            "justMyCode": false
+        },
+        {
+            "name": "Unit Tests (pytest)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": ["test/unit_tests", "--html=reports/pytest/pytest.html", "--cov", "--cov-report=html:reports/cover/pytest"],
+            "purpose": [
+                "debug-test",
+                "debug-in-terminal"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+        }
+    ]
+}

@@ -1,0 +1,48 @@
+[build-system]
+requires = [
+    "setuptools>=61.0",
+    "wheel"
+    ]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rdp_streamlit_hackathon"
+version = "0.0.1"
+authors = [
+    { name = "RDP Hackathon", email = "hack@thon.com" }
+]
+description = "A sample application"
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent"
+    ]
+requires-python = ">= 3.11"
+dependencies = [
+    "python-json-logger==3.3.0",
+    "pyyaml>=5.0.0",
+    "streamlit==1.47.1",
+]
+
+[project.urls]
+Repository = "https://github.com/rherro123/rdp-streamlit-hackathon.git"
+Issues = "https://github.com/rherro123/rdp-streamlit-hackathon/issues"
+
+[tool.ruff]
+select = ["E", "F", "B"]
+line-length = 150
+target-version = "py311"
+extend-exclude = ["test"]
+output-format = "github"
+
+[tool.mypy]
+strict = true  # enable hard mode
+ignore_missing_imports = false
+show_column_numbers = true
+show_error_context = true
+pretty = true
+color_output = true
+error_summary = true
+exclude = ["test"] # regex files that should be ignored, each item in array is ORed
+#linecount_report = "typed_linecount.txt"
+#lineprecision_report = "typed_precision.txt"

@@ -1,0 +1,16 @@
+# core dependencies
+python-json-logger==3.3.0
+pyyaml>=5.0.0
+streamlit==1.47.1
+
+# local / testing dependencies
+pytest~=8.4
+pytest-asyncio~=1.0
+pytest-cov~=6.2
+pytest-mock~=3.14
+pytest-html~=4.1
+httpx~=0.28
+
+# types
+mypy~=1.16
+lxml~=6.0
