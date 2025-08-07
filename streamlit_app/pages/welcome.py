@@ -30,21 +30,54 @@ def display_all_times(c):
     st.info(time_str)
 
 
+
+
 def main():
-    connection, cursor = connect_to_db()
+    st.sidebar.title("Nav")
+    st.sidebar.markdown(
+        """
+        <div style='margin-top:50px; margin-bottom:20px;'>
+            <button style='width:100%; height:40px;'>Custom Button 1</button>
+        </div>
+        <div style='margin-top:100px;'>
+            <button style='width:100%; height:40px;'>Custom Button 2</button>
+        </div>
+        <div style='margin-top:100px;'>
+            <button style='width:100%; height:40px;'>Custom Button 3</button>
+        </div>
+        <div style='margin-top:100px;'>
+            <button style='width:100%; height:40px;'>Custom Button 4</button>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
 
-    st.markdown('''### Welcome to the RDP Hackathon!
-    This app uses Streamlit, Python and SQLite.''')
+    col1, col2, col3 = st.columns(3)
 
-    if st.button('Add Current Time'):
-        add_time(connection, cursor)
+    with col1:
+        st.markdown(
+            """
+            <div style=' position: fixed; left: 0; bottom: 0; height:300px; border:2px solid #CCC; padding:10px; border-radius:8px;'>Container 1</div>
+            """,
+            unsafe_allow_html=True
+        )
 
-    if st.button('Remove Last Time'):
-        delete_latest_time(connection, cursor)
+    with col2:
+        st.markdown(
+            """
+            <div style='position: fixed; left: 50%; bottom: 0; height:300px; border:2px solid #CCC; padding:10px; border-radius:8px;'>Container 2</div>
+            """,
+            unsafe_allow_html=True
+        )
 
-    display_all_times(cursor)
-
-    connection.close()
+    with col3:
+        st.markdown(
+            """
+            <div style='position: fixed; right: 0; bottom: 0;height:300px; border:2px solid #CCC; padding:10px; border-radius:8px;'>Container 3</div>
+            """,
+            unsafe_allow_html=True
+        )
 
 
 main()
