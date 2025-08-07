@@ -14,6 +14,7 @@ def _configure_logging() -> None:
 def main() -> None:
     welcome = st.Page("pages/welcome.py", title="Welcome", icon=":material/home:", default=True)
 
+    print("Hello World")
     pg = st.navigation(
         {
             "App": [welcome],
