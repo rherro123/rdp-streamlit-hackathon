@@ -2,6 +2,7 @@
 python-json-logger==3.3.0
 pyyaml>=5.0.0
 streamlit==1.47.1
+pandas==2.2.3
 
 # local / testing dependencies
 pytest~=8.4
