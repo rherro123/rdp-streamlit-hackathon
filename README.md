@@ -3,9 +3,10 @@ This is a basic Python/Streamlit framework for the RDP Hackathon.
 
 ## Quick Start
 1. Clone this repository
-1. Use VSCode to open this repo in a devcontainer.  This devcontainer will have many of the tools that you will need to get started working right away.
-1. Run the application via the Run/Debug menu by selecting `Python: Streamlit App` and clicking the play button.
-1. If Streamlit prompts for an email, just hit enter - then it should pop up a tab into your browser with the app.
+1. From root directory, run:
+```
+streamlit run ./streamlit_app/app.py
+```
 
 ## Streamlit Documentation/Start Guide:
 Streamlit is a Python library that provides an easy way to build a website for a service. The program handles both the front and back end of a website

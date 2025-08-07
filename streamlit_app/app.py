@@ -2,7 +2,7 @@ import traceback
 
 import streamlit as st
 
-from streamlit_app._logger import log, logging_config
+from _logger import log, logging_config
 
 
 @st.cache_resource
