@@ -6,7 +6,8 @@ import sys
 import os
 import threading, time
 import random
-
+from pages.alerts import flag_hot_sku
+    
 class WarehouseData:
     def __init__(self, alerts: pd.DataFrame=None, skus:pd.DataFrame=None, dock_status:pd.DataFrame=None, skus_all:pd.DataFrame=None, production_pipeline:pd.DataFrame=None):
         self.alerts = alerts
@@ -35,7 +36,7 @@ def get_data():
 
     skus_df = pd.read_sql('SELECT * FROM skus WHERE sku_id IN (SELECT sku_id FROM alerts);', conn_ref)
     
-    dock_status_df = pd.read_sql('SELECT * FROM dock_status', conn_ref)
+    dock_status_df = pd.read_sql('SELECT d.*, s.product_name, s.product_number, s.destination, s.remortgage_gallons, s.pallets, s.weight_lbs FROM dock_status as d INNER JOIN skus as s ON d.sku_id = s.sku_id', conn_ref)
 
     skus_all_df = pd.read_sql('SELECT * FROM skus;', conn_ref)
     production_pipeline_df = pd.read_sql('SELECT * FROM production_pipeline', conn_ref)    
@@ -62,15 +63,22 @@ def main():
     # real-time data simulation happens in this while loop
     while True:
         with placeholder.container():
-            df = data.alerts
-            df['test'] = random.randint(0, 100)
+            
+            ### THIS SECTION JUST RANDOMIZES DAYS OF SERVICE VALUE
+            random_row = data.dock_status.sample(n=1)
+            random_index = random_row.index[0]
+                        
+            data.dock_status.loc[random_index, 'days_of_service'] = random.randint(1, 20)
+            
+            
+            flagged_skus_df = data.dock_status.style.apply(flag_hot_sku, axis=1)    
             
             st.markdown('### Alerts')
             st.dataframe(data.alerts)
             st.markdown('### SKUs')
             st.dataframe(data.skus)
             st.markdown('### Dock Status')
-            st.dataframe(data.dock_status)
+            st.dataframe(flagged_skus_df)
             st.markdown('### Production Pipeline')
             st.dataframe(data.production_pipeline)
             st.markdown('### SKUs All')
