@@ -37,6 +37,8 @@ def get_all_data():
                                 FROM dock_status as d INNER JOIN 
                                     skus as s ON d.sku_id = s.sku_id""", conn_ref)
 
+    dock_status_df['last_refresh'] = pd.to_datetime(dock_status_df['last_refresh'], format='%Y-%m-%d %H:%M:%S')
+    dock_status_df['days_of_service'].astype(int)
     
     dock_status_df.rename(columns={'staging_lane': 'Staging Lane', 
                                    'dock_location': 'Dock Location', 
@@ -44,6 +46,7 @@ def get_all_data():
                                    'product_name': 'Product Name',
                                    'product_number': 'Product Number',
                                    'days_of_service': 'Days of Service',
+                                   'dock_aging_time': 'Dock Aging Time',
                                    'destination': 'Destination',
                                    'remortgage_gallons': 'Remortgage Gallons',
                                    'pallets': 'Pallets',

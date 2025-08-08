@@ -9,10 +9,10 @@ import random
 from pages.alerts import flag_hot_sku
 from db import get_all_data, WarehouseData
 import os
+from datetime import datetime
 
 def main():
     data = get_all_data()
-    print(os.getcwd())
     st.set_page_config(
         page_title="Real-time Dock Status Dashboard",
         page_icon="✅",
@@ -32,7 +32,7 @@ def main():
             random_index = random_row.index[0]
                         
             data.dock_status.loc[random_index, 'Days of Service'] = random.randint(1, 20)
-            
+            data.dock_status.loc[random_index, 'Last Refresh'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             flagged_skus_df = data.dock_status.style.apply(flag_hot_sku, axis=1)    
             
             st.markdown('### Alerts')
