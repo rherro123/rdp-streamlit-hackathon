@@ -165,3 +165,5 @@ local-logging.config
 local-uvicorn_conf.yaml
 .run/**
 scrap*
+*.config
+*.toml
