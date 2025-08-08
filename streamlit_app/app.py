@@ -10,7 +10,6 @@ def _configure_logging() -> None:
     logging_config()
     log.info("Starting application...")
 
-
 def main() -> None:
     dashboard = st.Page("pages/dashboard.py", title="Dashboard", icon=":material/home:", default=True)
 
@@ -21,7 +20,6 @@ def main() -> None:
     )
 
     pg.run()
-
 
 if __name__ == "__main__":
     try:
