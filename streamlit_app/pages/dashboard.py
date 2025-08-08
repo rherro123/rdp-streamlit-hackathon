@@ -6,45 +6,143 @@ import sys
 import os
 import threading, time
 import random
+import numpy as np
+
 from pages.alerts import flag_hot_sku
+from streamlit_extras.stylable_container import stylable_container
+from components.DOS_bar_chart import fetch_DOS_count
+from components.PP_pie_chart import production_pipeline_pie_chart_altair
 from db import get_all_data, WarehouseData
-import os
 
 def main():
+    """
+    Launches a real-time Streamlit dashboard for monitoring dock status and SKU alerts.
+    """
+
     data = get_all_data()
-    print(os.getcwd())
+
+    home = st.sidebar.button("Home")
+    sku_view = st.sidebar.button("SKUs")
+    lane_view = st.sidebar.button("Lanes")
+    pp_view = st.sidebar.button("Production Pipeline")
+
     st.set_page_config(
         page_title="Real-time Dock Status Dashboard",
-        page_icon="✅",
+        page_icon="📦",
         layout="wide",
     )
-    
-    st.title("Dock Status Dashboard")  
 
+    def side_buttons():
+        with stylable_container(
+            key="sidebar_buttons",
+            css_styles="""
+                button {
+                    background-color: green;
+                    color: white;
+                    border-radius: 10px;
+                    margin-bottom: 12px;
+                }
+            """,
+        ):
+            st.empty()
+
+    with st.sidebar:
+        side_buttons()
+
+    with st.sidebar:
+        st.markdown("""
+            <style>
+            .settings-button-container button {
+                background-color: green;
+                color: white;
+                border-radius: 10px;
+                width: 100%;
+                padding: 0.5em 1em;
+                font-weight: bold;
+                border: none;
+                bottom:0;
+            }
+            </style>
+            <div class="settings-button-container">
+                <button type>⚙️ Settings</button>
+            </div>
+        """, unsafe_allow_html=True)
+
+    filter_col1, filter_col2, filter_col3 = st.columns(3)
+
+    with filter_col1:
+        urgency_filter = st.selectbox('Select urgency', options=['All', 'Urgent', 'Not-Urgent'])
+
+    with filter_col2:
+        dock_filter = st.selectbox('Select dock location', options=np.insert(data.dock_status['Dock Location'].unique(), 0, 'All'))
+
+    with filter_col3:
+        destination_filter = st.selectbox('Select destination', options=np.insert(data.dock_status['Destination'].unique(), 0, 'All'))
+
+    st.title("Dock Status Dashboard")
     placeholder = st.empty()
-   
-    # real-time data simulation happens in this while loop
-    while True:
-        with placeholder.container():
-            
-            ### THIS SECTION JUST RANDOMIZES DAYS OF SERVICE VALUE
-            random_row = data.dock_status.sample(n=1)
-            random_index = random_row.index[0]
-                        
-            data.dock_status.loc[random_index, 'Days of Service'] = random.randint(1, 20)
-            
-            flagged_skus_df = data.dock_status.style.apply(flag_hot_sku, axis=1)    
-            
-            st.markdown('### Alerts')
-            st.dataframe(data.alerts)
-            st.markdown('### SKUs')
-            st.dataframe(data.skus)
-            st.markdown('### Dock Status')
-            st.dataframe(flagged_skus_df)
-            st.markdown('### Production Pipeline')
-            st.dataframe(data.production_pipeline)
-            st.markdown('### SKUs All')
-            st.dataframe(data.skus_all)
-            time.sleep(2)
+
+    if sku_view:
+        st.markdown('### SKU Overview')
+        st.dataframe(data.skus)
+
+    elif lane_view:
+        st.markdown('### Dock Overview')
+        st.dataframe(data.dock_status)
+
+    elif pp_view:
+        st.markdown('### Production Pipeline Overview')
+        st.dataframe(data.production_pipeline)
+
+    else:
+        hidden = st.sidebar.checkbox("Hide graphs")
+        while True:
+            with placeholder.container():
+                if not hidden:
+                    pie, bar = st.columns(2)
+                    with bar:
+                        DOS_count_df = fetch_DOS_count(data.dock_status)
+                        st.markdown('### Urgent Items')
+                        st.altair_chart(DOS_count_df)
+                    with pie:
+                        production_pipeline_pie_chart_altair(data)
+
+                # Randomize 'Days of Service' for a random SKU
+                random_row = data.dock_status.sample(n=1)
+                random_index = random_row.index[0]
+                current_days_of_service = data.dock_status.loc[random_index, 'Days of Service']
+                data.dock_status.loc[random_index, 'Days of Service'] = current_days_of_service - 1 if current_days_of_service > 1 else 99
+                data.dock_status.loc[random_index, 'Last Refresh'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+                # Apply conditional formatting
+                flagged_skus_df = data.dock_status.style.apply(flag_hot_sku, axis=1)
+
+                col1, col2, col3 = st.columns(3)
+
+                with col1:
+                    st.markdown('### Alerts')
+                    st.dataframe(data.alerts)
+
+                with col2:
+                    st.markdown('### Dock Status')
+                    filtered_df = data.dock_status
+
+                    if destination_filter != 'All':
+                        filtered_df = filtered_df[data.dock_status['Destination'] == destination_filter]
+                    if dock_filter != 'All':
+                        filtered_df = filtered_df[filtered_df['Dock Location'] == dock_filter]
+                    if urgency_filter == 'Urgent':
+                        filtered_df = filtered_df[filtered_df['Days of Service'] <= 7]
+                    elif urgency_filter == 'Not-Urgent':
+                        filtered_df = filtered_df[filtered_df['Days of Service'] > 7]
+
+                    flagged_skus_df = filtered_df.style.apply(flag_hot_sku, axis=1)
+                    st.dataframe(flagged_skus_df)
+
+                with col3:
+                    st.markdown('### Production Pipeline')
+                    st.dataframe(data.production_pipeline)
+
+                time.sleep(2)
 
 main()
