@@ -6,7 +6,9 @@ import sys
 import os
 import threading, time
 import random
-from pages.alerts import flag_hot_sku
+import altair as alt
+from pages.alerts import flag_hot_sku, alert_severity_map # 2nd import is temporary
+from components.DOS_bar_chart import fetch_DOS_count
 from db import get_all_data, WarehouseData
 import numpy as np
 
@@ -61,8 +63,14 @@ def main():
 
             data.dock_status.loc[random_index, 'Days of Service'] = current_days_of_service - 1 if current_days_of_service > 1 else 99
             data.dock_status.loc[random_index, 'Last Refresh'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            
+
+            # Apply conditional formatting
+            flagged_skus_df = data.dock_status.style.apply(flag_hot_sku, axis=1)   
+            DOS_count_df =  fetch_DOS_count(data.dock_status)
+
             # Display dashboard sections
+            st.markdown('### Urgent Items')
+            st.altair_chart(DOS_count_df) 
             with col1:
                 st.markdown('### Alerts')
                 st.dataframe(data.alerts)
