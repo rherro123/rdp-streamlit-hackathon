@@ -12,11 +12,11 @@ def _configure_logging() -> None:
 
 
 def main() -> None:
-    welcome = st.Page("pages/welcome.py", title="Welcome", icon=":material/home:", default=True)
+    dashboard = st.Page("pages/dashboard.py", title="Dashboard", icon=":material/home:", default=True)
 
     pg = st.navigation(
         {
-            "App": [welcome],
+            "App": [dashboard],
         }
     )
 
