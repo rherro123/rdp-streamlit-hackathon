@@ -7,8 +7,16 @@ import os
 import threading, time
 import random
 from pages.alerts import flag_hot_sku
+from components.DOS_bar_chart import fetch_DOS_count
+from components.PP_pie_chart import production_pipeline_pie_chart_altair
 from db import get_all_data, WarehouseData
 
+def make_autopct(values):
+    def my_autopct(pct):
+        total = sum(values)
+        val = int(round(pct*total/100.0))
+        return f'{val}'
+    return my_autopct
 def main():
     """
     Launches a real-time Streamlit dashboard for monitoring dock status and SKU alerts.
@@ -27,6 +35,12 @@ def main():
         To stop the dashboard, interrupt the Streamlit app manually.
     """
     data = get_all_data()
+    st.sidebar.title("Home")
+    hidden = st.sidebar.checkbox("Hide graphs")
+    st.sidebar.button("SKUs")
+    st.sidebar.button("Lanes")
+    st.sidebar.button("Orders")
+    st.sidebar.button("Settings")
     st.set_page_config(
         page_title="Real-time Dock Status Dashboard",
         page_icon="📦",
@@ -35,11 +49,21 @@ def main():
     
     st.title("Dock Status Dashboard")  
     placeholder = st.empty()
-   
+
     # Real-time data simulation loop
     while True:
         with placeholder.container():
-            col1, col2, col3 = st.columns(3)
+            if not hidden:
+                pie, bar = st.columns(2)
+                with bar:
+                    DOS_count_df =  fetch_DOS_count(data.dock_status)
+
+                    # Display dashboard sections
+                    st.markdown('### Urgent Items')
+                    st.altair_chart(DOS_count_df)
+                with pie:
+                    production_pipeline_pie_chart_altair(data)
+
             # Randomize 'Days of Service' for a random SKU
             random_row = data.dock_status.sample(n=1)
             random_index = random_row.index[0]
@@ -47,8 +71,9 @@ def main():
             data.dock_status.loc[random_index, 'Last Refresh'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
             # Apply conditional formatting
-            flagged_skus_df = data.dock_status.style.apply(flag_hot_sku, axis=1)    
+            flagged_skus_df = data.dock_status.style.apply(flag_hot_sku, axis=1)
 
+            col1, col2, col3 = st.columns(3)
             # Display dashboard sections
             with col1:
                 st.markdown('### Alerts')
